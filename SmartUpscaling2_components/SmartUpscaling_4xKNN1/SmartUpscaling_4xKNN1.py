@@ -5,27 +5,25 @@ Smart Upscaling 2
 This is a script for Smart Upscaling 4xKNN1.
 The OpenCL kernel is stored in KNN1/kernel1.c
 
-It uses a similar method as Smart Upscaling 1, but divises the image into 4 blocs (performance mode).
+It uses a similar method as Smart Upscaling 1, but divises the image into multiple blocks (performance mode).
 
 Modes : 
-- Performance : 4 blocks* 
-- Balanced : 8 blocks*
-- Quality : 16 blocks*
+- Performance : 4 blocks  --> kernel_Performance.c | Suitable for 1080p
+- Balanced : 8 blocks --> kernel_Balanced.c | Suitable for 1080p/2160p
+- Quality : 16 blocks --> kernel_Quality.c | Suitable for 1080p/2160p
 
-- Ultra Performance : 1 block
-- Ultra Balanced : n blocks (square shape, AI decided)
-- Ultra Quality : n blocks (variable shape, AI decided)
-
-*for a Full HD / 1080p image
+- Ultra Performance : 1 block --> kernel_UltraPerformance.c | Suitable for 1080p
+- Ultra Balanced : n blocks (square shape, AI decided) --> kernel_UltraBalanced.c | Suitable for 2160p/4K 
+- Ultra Quality : n blocks (variable shape, AI decided) --> kernel_UltraQuality.c | Suitable for 4K/8K
 """
 import pyopencl as cl
 import numpy as np
 from PIL import Image
 
 
-def upscale_Ultra_Performance(image, scale):
+def upscale(image, scale, mode="UltraPerformance"):
     # Define the anti-aliasing factor
-    anti_aliasing = 256
+    anti_aliasing = 16
 
     # Load the low resolution image and convert to RGBA
     PIL_lowres = Image.open(image).convert("RGBA")
@@ -37,7 +35,7 @@ def upscale_Ultra_Performance(image, scale):
     highres = np.zeros((new_height, new_width, 4), dtype=np.uint8)
 
     # Read the kernel code
-    with open("KNN1/kernel1.c", "r") as cl_kernel:
+    with open(f"KNN1/kernel_{mode}.c", "r") as cl_kernel:
         kernel_code = cl_kernel.read()
 
     # Create the platform and device
@@ -76,10 +74,11 @@ def upscale_Ultra_Performance(image, scale):
 
     # Save the high resolution image (convert back to RGB)
     img=Image.fromarray(highres, 'RGBA').convert('RGB')
-    img.save(f"tests/result_UltraPerformance_x{scale}.jpg")
+    img.save(f"tests/result_{mode}_x{scale}_AAx{anti_aliasing}.jpg")
     img.show()
 
 
 
 if __name__ == "__main__":
-    upscale_Ultra_Performance("tests/image.jpg", 2)
+    #Tested : UltraPerformance | Validated
+    upscale("tests/image.jpg", 2, "Performance")
