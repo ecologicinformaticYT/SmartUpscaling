@@ -1,0 +1,6 @@
+SmartUpscaling_SmartColorsPrediction1
+
+3 modes :
+- edges only 3/4 + colored 1/4 | format 1 --> colored image (AI accelerated)
+- black & white image - format 2 --> colored image (algorithmic coloration)
+- black & white image --> format 1 (image) --> colored image (AI accelerated)
