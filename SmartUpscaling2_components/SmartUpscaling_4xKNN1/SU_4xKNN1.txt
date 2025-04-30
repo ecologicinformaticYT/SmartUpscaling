@@ -1,5 +1,0 @@
-SmartUpscaling_4xKNeuralNetwork1.
-
---> divides the image in 4
---> upscales the 4 parts
-The upscaling of each part is performed by an improved version of SmartUpscaling_KNN1.
